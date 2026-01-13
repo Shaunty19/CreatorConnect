@@ -9,12 +9,15 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React and ReactDOM - Using development versions for better error messages -->
+    <!-- React and ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
     <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         body {
@@ -25,18 +28,19 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        /* Lucide Icons CSS */
         .lucide { width: 1em; height: 1em; display: inline-block; vertical-align: middle; }
     </style>
 </head>
 <body>
     <div id="root"></div>
     
-    <!-- Load Lucide Icons separately -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
+        
+        // Initialize Supabase client
+        const SUPABASE_URL = 'https://wmnuchdpduqgzyvztubx.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbnVjaGRwZHVxZ3p5dnp0dWJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODQwNTcsImV4cCI6MjA4Mzg2MDA1N30.ZNzwVTK-AEK60dXVPTlXvO-KfKRe8QMtLvfVb5nsBvg';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Lucide icon components
         const Search = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>;
@@ -50,174 +54,117 @@
         const Phone = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
         const Instagram = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
         const Plus = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
+        const Loader = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>;
 
         function CreatorConnect() {
             const [activeTab, setActiveTab] = useState('opportunities');
             const [filterType, setFilterType] = useState('all');
             const [searchTerm, setSearchTerm] = useState('');
             const [showPostForm, setShowPostForm] = useState(false);
-
-            const [opportunities, setOpportunities] = useState([
-                {
-                    id: 1,
-                    brand: "Monsoon Spice Restaurant",
-                    title: "Restaurant Review & Reel Creation",
-                    type: "paid",
-                    budget: "$200-300",
-                    location: "Mumbai, India",
-                    category: "Food & Dining",
-                    niche: "Food",
-                    description: "Looking for food bloggers to create Instagram reels featuring our new Pan-Asian menu. Must have 10k+ followers.",
-                    requirements: "10k+ followers, Good video editing skills, Mumbai-based preferred",
-                    contact: {
-                        name: "Priya Sharma",
-                        email: "priya@monsoonspice.com",
-                        phone: "+91 98765 43210",
-                        instagram: "@monsoonspiceofficial"
-                    },
-                    postedDate: "2 days ago",
-                    isPremium: true
-                },
-                {
-                    id: 2,
-                    brand: "LuxeStyle Fashion",
-                    title: "Spring Collection Launch Campaign",
-                    type: "paid",
-                    budget: "$500-800",
-                    location: "Remote (Global)",
-                    category: "Fashion",
-                    niche: "Fashion",
-                    description: "Seeking fashion influencers for our Spring 2025 collection launch. Create 3 posts + 2 reels featuring our new sustainable clothing line.",
-                    requirements: "20k+ followers, Fashion/Lifestyle niche, Strong aesthetic, Previous brand collaborations",
-                    contact: {
-                        name: "Sophie Chen",
-                        email: "partnerships@luxestyle.com",
-                        instagram: "@luxestylefashion"
-                    },
-                    postedDate: "1 day ago",
-                    isPremium: true
-                },
-                {
-                    id: 3,
-                    brand: "TechGear Pro",
-                    title: "Product Unboxing & Review - Wireless Earbuds",
-                    type: "barter",
-                    location: "USA, UK, Canada",
-                    category: "Tech & Gadgets",
-                    niche: "Tech",
-                    description: "Barter collaboration for our premium wireless earbuds (worth $199). Create an unboxing video + honest review for YouTube/Instagram.",
-                    requirements: "Tech review niche, 5k+ followers, YouTube channel preferred, Good video quality",
-                    contact: {
-                        name: "Mike Rodriguez",
-                        email: "influencer@techgearpro.com",
-                        phone: "+1 555-0123",
-                        instagram: "@techgearpro"
-                    },
-                    postedDate: "3 days ago",
-                    isPremium: false
-                },
-                {
-                    id: 4,
-                    brand: "Wanderlust Travel Agency",
-                    title: "Travel Vlog Series - Bali Adventure",
-                    type: "paid",
-                    budget: "$2000 + All Expenses",
-                    location: "Bali, Indonesia",
-                    category: "Travel & Tourism",
-                    niche: "Travel",
-                    description: "All-expenses-paid trip to Bali + payment for creating a 3-part travel vlog series. Stay in luxury resorts and showcase unique experiences.",
-                    requirements: "Travel vlogger, 30k+ followers, Professional video editing, Available in March 2025",
-                    contact: {
-                        name: "Emma Thompson",
-                        email: "creators@wanderlust.com",
-                        instagram: "@wanderlustofficial"
-                    },
-                    postedDate: "5 days ago",
-                    isPremium: true
-                },
-                {
-                    id: 5,
-                    brand: "GlowUp Beauty Co.",
-                    title: "Skincare Routine Tutorial",
-                    type: "barter",
-                    location: "Pan India",
-                    category: "Beauty & Skincare",
-                    niche: "Beauty",
-                    description: "Receive our complete skincare range (worth $300) in exchange for a detailed skincare routine tutorial featuring our products.",
-                    requirements: "Beauty/Skincare niche, 8k+ followers, Clear skin close-ups, Instagram & TikTok active",
-                    contact: {
-                        name: "Aisha Patel",
-                        email: "collab@glowupbeauty.com",
-                        instagram: "@glowupbeautyco"
-                    },
-                    postedDate: "1 week ago",
-                    isPremium: false
-                },
-                {
-                    id: 6,
-                    brand: "FitLife Supplements",
-                    title: "3-Month Brand Ambassador Program",
-                    type: "paid",
-                    budget: "$1000/month",
-                    location: "Remote",
-                    category: "Fitness & Wellness",
-                    niche: "Fitness",
-                    description: "Long-term partnership with fitness influencers. Create weekly content showing your fitness journey with our supplements. Performance bonuses available.",
-                    requirements: "Fitness niche, 25k+ followers, Consistent posting, Authentic voice, Gym/home workout content",
-                    contact: {
-                        name: "Jason Lee",
-                        email: "ambassadors@fitlife.com",
-                        phone: "+1 555-9876",
-                        instagram: "@fitlifesupplements"
-                    },
-                    postedDate: "4 days ago",
-                    isPremium: true
-                }
-            ]);
+            const [opportunities, setOpportunities] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [submitting, setSubmitting] = useState(false);
 
             const [formData, setFormData] = useState({
-                brand: '', title: '', type: 'paid', budget: '', location: '', category: '',
+                brand: '', title: '', type: 'paid', budget: '', location: '', category: '', niche: '',
                 description: '', requirements: '', contactName: '', contactEmail: '',
                 contactPhone: '', contactInsta: ''
             });
+
+            // Fetch opportunities from Supabase
+            const fetchOpportunities = async () => {
+                try {
+                    setLoading(true);
+                    const { data, error } = await supabase
+                        .from('opportunities')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) throw error;
+                    
+                    setOpportunities(data || []);
+                } catch (error) {
+                    console.error('Error fetching opportunities:', error);
+                    alert('Error loading opportunities. Please refresh the page.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            // Load opportunities on component mount
+            useEffect(() => {
+                fetchOpportunities();
+            }, []);
 
             const filteredOpportunities = opportunities.filter(opp => {
                 const matchesType = filterType === 'all' || opp.type === filterType;
                 const matchesSearch = searchTerm === '' || 
                     opp.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    opp.category.toLowerCase().includes(searchTerm.toLowerCase());
+                    (opp.category && opp.category.toLowerCase().includes(searchTerm.toLowerCase()));
                 return matchesType && matchesSearch;
             });
 
-            const handleSubmitOpportunity = (e) => {
+            const handleSubmitOpportunity = async (e) => {
                 e.preventDefault();
-                const newOpp = {
-                    id: opportunities.length + 1,
-                    brand: formData.brand,
-                    title: formData.title,
-                    type: formData.type,
-                    budget: formData.budget,
-                    location: formData.location,
-                    category: formData.category,
-                    description: formData.description,
-                    requirements: formData.requirements,
-                    contact: {
-                        name: formData.contactName,
-                        email: formData.contactEmail,
-                        phone: formData.contactPhone,
-                        instagram: formData.contactInsta
-                    },
-                    postedDate: "Just now",
-                    isPremium: false
-                };
-                setOpportunities([newOpp, ...opportunities]);
-                setShowPostForm(false);
-                setFormData({
-                    brand: '', title: '', type: 'paid', budget: '', location: '', category: '',
-                    description: '', requirements: '', contactName: '', contactEmail: '',
-                    contactPhone: '', contactInsta: ''
-                });
+                setSubmitting(true);
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('opportunities')
+                        .insert([
+                            {
+                                brand: formData.brand,
+                                title: formData.title,
+                                type: formData.type,
+                                budget: formData.budget || null,
+                                location: formData.location,
+                                category: formData.category || null,
+                                niche: formData.niche || null,
+                                description: formData.description,
+                                requirements: formData.requirements || null,
+                                contact_name: formData.contactName,
+                                contact_email: formData.contactEmail,
+                                contact_phone: formData.contactPhone || null,
+                                contact_instagram: formData.contactInsta || null,
+                                is_premium: false
+                            }
+                        ])
+                        .select();
+                    
+                    if (error) throw error;
+                    
+                    // Reset form and close modal
+                    setFormData({
+                        brand: '', title: '', type: 'paid', budget: '', location: '', category: '', niche: '',
+                        description: '', requirements: '', contactName: '', contactEmail: '',
+                        contactPhone: '', contactInsta: ''
+                    });
+                    setShowPostForm(false);
+                    
+                    // Refresh opportunities list
+                    await fetchOpportunities();
+                    
+                    alert('Opportunity posted successfully! ✅');
+                } catch (error) {
+                    console.error('Error posting opportunity:', error);
+                    alert('Error posting opportunity. Please try again.');
+                } finally {
+                    setSubmitting(false);
+                }
+            };
+
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return 'Yesterday';
+                if (diffDays < 7) return `${diffDays} days ago`;
+                if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+                return `${Math.floor(diffDays / 30)} months ago`;
             };
 
             return (
@@ -269,7 +216,6 @@
                                 </div>
                             </div>
                             
-                            {/* Mobile Navigation */}
                             <nav className="md:hidden flex gap-2 mt-4">
                                 <button
                                     onClick={() => setActiveTab('opportunities')}
@@ -314,7 +260,10 @@
                                         <input type="text" placeholder="Budget/Value" value={formData.budget} onChange={(e) => setFormData({...formData, budget: e.target.value})} className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
                                         <input type="text" placeholder="Location *" required value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
                                     </div>
-                                    <input type="text" placeholder="Category (e.g., Fashion, Food, Tech, Beauty, Travel, Fitness)" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <input type="text" placeholder="Category (e.g., Fashion, Food, Tech)" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
+                                        <input type="text" placeholder="Niche (e.g., Beauty, Travel, Fitness)" value={formData.niche} onChange={(e) => setFormData({...formData, niche: e.target.value})} className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
+                                    </div>
                                     <textarea placeholder="Description *" required rows="3" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
                                     <textarea placeholder="Requirements (follower count, location, skills, etc.)" rows="2" value={formData.requirements} onChange={(e) => setFormData({...formData, requirements: e.target.value})} className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
                                     <div className="border-t pt-4">
@@ -327,7 +276,9 @@
                                         </div>
                                     </div>
                                     <div className="flex gap-3 pt-2">
-                                        <button type="submit" className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all">Submit Opportunity</button>
+                                        <button type="submit" disabled={submitting} className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                                            {submitting ? <><Loader /> Posting...</> : 'Submit Opportunity'}
+                                        </button>
                                         <button type="button" onClick={() => setShowPostForm(false)} className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">Cancel</button>
                                     </div>
                                 </form>
@@ -348,64 +299,70 @@
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            {filteredOpportunities.map((opp) => (
-                                <div key={opp.id} className={`bg-white rounded-2xl shadow-sm hover:shadow-md transition-all p-6 border ${opp.isPremium ? 'border-orange-300 ring-2 ring-orange-100' : 'border-gray-100'}`}>
-                                    {opp.isPremium && (
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <Star />
-                                            <span className="text-xs font-semibold text-orange-600 uppercase tracking-wide">Premium Listing</span>
+                        {loading ? (
+                            <div className="text-center py-12 bg-white rounded-2xl">
+                                <div className="inline-block"><Loader /></div>
+                                <p className="text-gray-500 mt-3">Loading opportunities...</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredOpportunities.map((opp) => (
+                                    <div key={opp.id} className={`bg-white rounded-2xl shadow-sm hover:shadow-md transition-all p-6 border ${opp.is_premium ? 'border-orange-300 ring-2 ring-orange-100' : 'border-gray-100'}`}>
+                                        {opp.is_premium && (
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <Star />
+                                                <span className="text-xs font-semibold text-orange-600 uppercase tracking-wide">Premium Listing</span>
+                                            </div>
+                                        )}
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex-1">
+                                                <h3 className="text-xl font-bold text-gray-800 mb-1">{opp.title}</h3>
+                                                <p className="text-orange-600 font-semibold">{opp.brand}</p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {opp.type === 'paid' ? (
+                                                    <span className="bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-1"><DollarSign /> Paid</span>
+                                                ) : (
+                                                    <span className="bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-1"><Gift /> Barter</span>
+                                                )}
+                                            </div>
                                         </div>
-                                    )}
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex-1">
-                                            <h3 className="text-xl font-bold text-gray-800 mb-1">{opp.title}</h3>
-                                            <p className="text-orange-600 font-semibold">{opp.brand}</p>
+                                        <div className="flex flex-wrap gap-3 mb-4 text-sm text-gray-600">
+                                            {opp.budget && <div className="flex items-center gap-1"><DollarSign /><span>{opp.budget}</span></div>}
+                                            <div className="flex items-center gap-1"><MapPin /><span>{opp.location}</span></div>
+                                            <div className="flex items-center gap-1"><Calendar /><span>{formatDate(opp.created_at)}</span></div>
+                                            {opp.category && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium">{opp.category}</span>}
+                                            {opp.niche && <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">{opp.niche}</span>}
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            {opp.type === 'paid' ? (
-                                                <span className="bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-1"><DollarSign /> Paid</span>
-                                            ) : (
-                                                <span className="bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-1"><Gift /> Barter</span>
-                                            )}
+                                        <p className="text-gray-700 mb-4">{opp.description}</p>
+                                        {opp.requirements && (
+                                            <div className="bg-orange-50 rounded-lg p-4 mb-4">
+                                                <p className="text-sm font-semibold text-gray-700 mb-1">Requirements:</p>
+                                                <p className="text-sm text-gray-600">{opp.requirements}</p>
+                                            </div>
+                                        )}
+                                        <div className="border-t pt-4">
+                                            <p className="text-sm font-semibold text-gray-700 mb-2">Contact Information:</p>
+                                            <div className="grid md:grid-cols-2 gap-3">
+                                                <div className="flex items-center gap-2 text-sm text-gray-600"><Mail /><a href={`mailto:${opp.contact_email}`} className="hover:text-orange-600 transition-colors">{opp.contact_email}</a></div>
+                                                {opp.contact_phone && <div className="flex items-center gap-2 text-sm text-gray-600"><Phone /><a href={`tel:${opp.contact_phone}`} className="hover:text-orange-600 transition-colors">{opp.contact_phone}</a></div>}
+                                                {opp.contact_instagram && <div className="flex items-center gap-2 text-sm text-gray-600"><Instagram /><a href={`https://instagram.com/${opp.contact_instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-orange-600 transition-colors">{opp.contact_instagram}</a></div>}
+                                                <div className="flex items-center gap-2 text-sm text-gray-600"><Users /><span>{opp.contact_name}</span></div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-wrap gap-3 mb-4 text-sm text-gray-600">
-                                        {opp.budget && <div className="flex items-center gap-1"><DollarSign /><span>{opp.budget}</span></div>}
-                                        <div className="flex items-center gap-1"><MapPin /><span>{opp.location}</span></div>
-                                        <div className="flex items-center gap-1"><Calendar /><span>{opp.postedDate}</span></div>
-                                        {opp.category && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium">{opp.category}</span>}
-                                        {opp.niche && <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">{opp.niche}</span>}
-                                    </div>
-                                    <p className="text-gray-700 mb-4">{opp.description}</p>
-                                    {opp.requirements && (
-                                        <div className="bg-orange-50 rounded-lg p-4 mb-4">
-                                            <p className="text-sm font-semibold text-gray-700 mb-1">Requirements:</p>
-                                            <p className="text-sm text-gray-600">{opp.requirements}</p>
-                                        </div>
-                                    )}
-                                    <div className="border-t pt-4">
-                                        <p className="text-sm font-semibold text-gray-700 mb-2">Contact Information:</p>
-                                        <div className="grid md:grid-cols-2 gap-3">
-                                            <div className="flex items-center gap-2 text-sm text-gray-600"><Mail /><a href={`mailto:${opp.contact.email}`} className="hover:text-orange-600 transition-colors">{opp.contact.email}</a></div>
-                                            {opp.contact.phone && <div className="flex items-center gap-2 text-sm text-gray-600"><Phone /><a href={`tel:${opp.contact.phone}`} className="hover:text-orange-600 transition-colors">{opp.contact.phone}</a></div>}
-                                            {opp.contact.instagram && <div className="flex items-center gap-2 text-sm text-gray-600"><Instagram /><a href={`https://instagram.com/${opp.contact.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-orange-600 transition-colors">{opp.contact.instagram}</a></div>}
-                                            <div className="flex items-center gap-2 text-sm text-gray-600"><Users /><span>{opp.contact.name}</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
 
-                        {filteredOpportunities.length === 0 && (
+                        {!loading && filteredOpportunities.length === 0 && (
                             <div className="text-center py-12 bg-white rounded-2xl">
                                 <div className="text-gray-300 mx-auto mb-3"><Search /></div>
-                                <p className="text-gray-500">No opportunities found matching your criteria.</p>
+                                <p className="text-gray-500">No opportunities found. Be the first to post one!</p>
                             </div>
                         )}
                         </>
                         ) : (
-                            /* Contact Tab Content */
                             <div className="max-w-3xl mx-auto">
                                 <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
                                     <div className="text-center mb-8">
@@ -486,7 +443,6 @@
             );
         }
 
-        // Wait for DOM to be ready, then render
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 const root = ReactDOM.createRoot(document.getElementById('root'));
