@@ -79,15 +79,24 @@
                         .filter(row => {
                             // Find brand field (could be named differently)
                             const brandField = row['Brand/Restaurant Name'] || row['Brand Name'] || row['Brand'];
-                            const titleField = row['Opportunity Title'] || row['Title'];
-                            console.log('Checking row:', { brandField, titleField });
-                            return brandField && titleField;
+                            console.log('Checking row:', { 
+                                brandField, 
+                                hasTitle: !!row['Opportunity Title'],
+                                hasDescription: !!row['Description']
+                            });
+                            return brandField && (row['Opportunity Title'] || row['Description']);
                         })
                         .map((row, index) => {
+                            // Use description as title if no title provided
+                            let title = row['Opportunity Title'] || row['Title'] || '';
+                            if (!title && row['Description']) {
+                                title = row['Description'].substring(0, 50) + (row['Description'].length > 50 ? '...' : '');
+                            }
+                            
                             const opportunity = {
                                 id: index + 1,
                                 brand: row['Brand/Restaurant Name'] || row['Brand Name'] || row['Brand'] || '',
-                                title: row['Opportunity Title'] || row['Title'] || '',
+                                title: title,
                                 type: (row['Type'] || '').toLowerCase().includes('paid') ? 'paid' : 'barter',
                                 budget: row['Budget/Value'] || row['Budget'] || null,
                                 location: row['Location'] || '',
