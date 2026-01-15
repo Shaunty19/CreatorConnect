@@ -71,19 +71,21 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     
-                    let data = await response.json();
-                    console.log('API data received:', data);
-                    console.log('First row keys:', data[0] ? Object.keys(data[0]) : 'No data');
+                    let rawData = await response.json();
+                    console.log('API raw data received:', rawData);
+                    console.log('First row keys (raw):', rawData[0] ? Object.keys(rawData[0]) : 'No data');
                     
-                    // Fix: Trim whitespace from all keys
-                    data = data.map(row => {
+                    // CRITICAL FIX: Trim whitespace from all keys
+                    const data = rawData.map(row => {
                         const trimmedRow = {};
                         Object.keys(row).forEach(key => {
-                            trimmedRow[key.trim()] = row[key];
+                            const trimmedKey = key.trim();
+                            trimmedRow[trimmedKey] = row[key];
                         });
                         return trimmedRow;
                     });
-                    console.log('After trimming keys:', data[0] ? Object.keys(data[0]) : 'No data');
+                    console.log('After trimming - first row keys:', data[0] ? Object.keys(data[0]) : 'No data');
+                    console.log('After trimming - sample row:', data[0]);
                     
                     const formattedData = data
                         .filter(row => {
