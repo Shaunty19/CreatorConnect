@@ -73,30 +73,41 @@
                     
                     const data = await response.json();
                     console.log('API data received:', data);
+                    console.log('First row keys:', data[0] ? Object.keys(data[0]) : 'No data');
                     
                     const formattedData = data
-                        .filter(row => row['Brand/Restaurant Name'] && row['Opportunity Title'])
-                        .map((row, index) => ({
-                            id: index + 1,
-                            brand: row['Brand/Restaurant Name'] || '',
-                            title: row['Opportunity Title'] || '',
-                            type: row['Type']?.toLowerCase().includes('paid') ? 'paid' : 'barter',
-                            budget: row['Budget/Value'] || null,
-                            location: row['Location'] || '',
-                            category: row['Category (Food, Beauty, Tech etc)'] || null,
-                            niche: row['Niche'] || null,
-                            description: row['Description'] || '',
-                            requirements: row['Requirements (Followers Count)'] || null,
-                            contact_name: row['Contact Name'] || '',
-                            contact_email: row['Contact Email'] || '',
-                            contact_phone: row['Contact Phone'] || '',
-                            contact_instagram: row['Instagram Handle'] || null,
-                            created_at: row['Timestamp'] || new Date().toISOString(),
-                            isPremium: false
-                        }))
+                        .filter(row => {
+                            // Find brand field (could be named differently)
+                            const brandField = row['Brand/Restaurant Name'] || row['Brand Name'] || row['Brand'];
+                            const titleField = row['Opportunity Title'] || row['Title'];
+                            console.log('Checking row:', { brandField, titleField });
+                            return brandField && titleField;
+                        })
+                        .map((row, index) => {
+                            const opportunity = {
+                                id: index + 1,
+                                brand: row['Brand/Restaurant Name'] || row['Brand Name'] || row['Brand'] || '',
+                                title: row['Opportunity Title'] || row['Title'] || '',
+                                type: (row['Type'] || '').toLowerCase().includes('paid') ? 'paid' : 'barter',
+                                budget: row['Budget/Value'] || row['Budget'] || null,
+                                location: row['Location'] || '',
+                                category: row['Category (Food, Beauty, Tech etc)'] || row['Category'] || null,
+                                niche: row['Niche'] || null,
+                                description: row['Description'] || '',
+                                requirements: row['Requirements (Followers Count)'] || row['Requirements'] || null,
+                                contact_name: row['Contact Name'] || '',
+                                contact_email: row['Contact Email'] || row['Email'] || '',
+                                contact_phone: row['Contact Phone'] || row['Phone'] || '',
+                                contact_instagram: row['Instagram Handle'] || row['Instagram'] || null,
+                                created_at: row['Timestamp'] || new Date().toISOString(),
+                                isPremium: false
+                            };
+                            console.log('Formatted opportunity:', opportunity);
+                            return opportunity;
+                        })
                         .reverse();
                     
-                    console.log('Formatted opportunities:', formattedData);
+                    console.log('Final formatted opportunities:', formattedData);
                     setOpportunities(formattedData);
                     setLoading(false);
                 } catch (err) {
